@@ -1488,10 +1488,13 @@ class GatewaySlashCommandsMixin:
         if not model_input and not explicit_provider:
             # Try interactive picker if the platform supports it
             adapter = self.adapters.get(source.platform)
-            has_picker = (
-                adapter is not None
-                and getattr(type(adapter), "send_model_picker", None) is not None
-            )
+            # Capability can be supplied by a plugin wrapper/proxy through the
+            # adapter instance rather than its concrete wrapper class. Checking
+            # ``type(adapter)`` misses that delegated method and incorrectly
+            # falls back to the plain-text model help on Telegram (#pluginized
+            # platform adapters). Resolve the live capability from the instance.
+            picker_sender = getattr(adapter, "send_model_picker", None) if adapter is not None else None
+            has_picker = callable(picker_sender)
 
             if has_picker:
                 try:
