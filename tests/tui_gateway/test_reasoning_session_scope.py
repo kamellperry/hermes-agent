@@ -106,8 +106,8 @@ class TestConfigSetReasoningSessionScope:
 
         assert resp["result"] == {"key": "reasoning", "value": "low", "scope": "global"}
         assert agent.reasoning_config == {"enabled": True, "effort": "low"}
-        assert session["create_reasoning_override"] is None
-        assert session["reasoning_config_override"] is None
+        assert session.get("create_reasoning_override") is None
+        assert session.get("reasoning_config_override") is None
         assert yaml.safe_load(config_path.read_text(encoding="utf-8"))["agent"]["reasoning_effort"] == "low"
 
     def test_no_session_persists_globally(self) -> None:
